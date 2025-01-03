@@ -1,11 +1,9 @@
 import models.File;
 import repositories.FileRepository;
-import strategy.JsonSaveStrategy;
-import strategy.TxtSaveStrategy;
-import strategy.XmlSaveStrategy;
-import commands.CommandInvoker;
-import commands.SaveFileCommand;
-import commands.Command;
+import template.FileProcessor;
+import template.JsonFileProcessor;
+import template.TxtFileProcessor;
+import template.XmlFileProcessor;
 import observer.LogObserver;
 import observer.UIObserver;
 
@@ -26,24 +24,17 @@ public class Main {
         file.setFileName("example");
         file.setContent("This is a sample content.");
 
-        // Ініціалізація Invoker
-        CommandInvoker invoker = new CommandInvoker();
+        // Обробка файлу з використанням шаблону "Template Method"
+        System.out.println("Processing file as TXT...");
+        FileProcessor txtProcessor = new TxtFileProcessor();
+        txtProcessor.processFile(file, "./");
 
-        // Виконання команд через патерн "Команда"
-        System.out.println("Saving file as TXT...");
-        Command saveAsTxt = new SaveFileCommand(fileRepository, file, new TxtSaveStrategy(), "./");
-        invoker.executeCommand(saveAsTxt);
+        System.out.println("Processing file as JSON...");
+        FileProcessor jsonProcessor = new JsonFileProcessor();
+        jsonProcessor.processFile(file, "./");
 
-        System.out.println("Saving file as JSON...");
-        Command saveAsJson = new SaveFileCommand(fileRepository, file, new JsonSaveStrategy(), "./");
-        invoker.executeCommand(saveAsJson);
-
-        System.out.println("Saving file as XML...");
-        Command saveAsXml = new SaveFileCommand(fileRepository, file, new XmlSaveStrategy(), "./");
-        invoker.executeCommand(saveAsXml);
-
-        // Опціонально: Undo останньої команди
-        System.out.println("Undoing last command...");
-        invoker.undoLastCommand();
+        System.out.println("Processing file as XML...");
+        FileProcessor xmlProcessor = new XmlFileProcessor();
+        xmlProcessor.processFile(file, "./");
     }
 }
