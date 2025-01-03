@@ -6,11 +6,19 @@ import strategy.XmlSaveStrategy;
 import commands.CommandInvoker;
 import commands.SaveFileCommand;
 import commands.Command;
+import observer.LogObserver;
+import observer.UIObserver;
 
 public class Main {
     public static void main(String[] args) {
         // Ініціалізація репозиторію для файлів
         FileRepository fileRepository = new FileRepository();
+
+        // Створення та додавання підписників
+        LogObserver logObserver = new LogObserver();
+        UIObserver uiObserver = new UIObserver();
+        fileRepository.attach(logObserver);
+        fileRepository.attach(uiObserver);
 
         // Створення прикладового файлу
         File file = new File();
@@ -21,20 +29,17 @@ public class Main {
         // Ініціалізація Invoker
         CommandInvoker invoker = new CommandInvoker();
 
-        Command saveCommand = new SaveFileCommand(fileRepository, file, new TxtSaveStrategy(), "./");
-        invoker.executeCommand(saveCommand);
-
         // Виконання команд через патерн "Команда"
         System.out.println("Saving file as TXT...");
-        SaveFileCommand saveAsTxt = new SaveFileCommand(fileRepository, file, new TxtSaveStrategy(), "./");
+        Command saveAsTxt = new SaveFileCommand(fileRepository, file, new TxtSaveStrategy(), "./");
         invoker.executeCommand(saveAsTxt);
 
         System.out.println("Saving file as JSON...");
-        SaveFileCommand saveAsJson = new SaveFileCommand(fileRepository, file, new JsonSaveStrategy(), "./");
+        Command saveAsJson = new SaveFileCommand(fileRepository, file, new JsonSaveStrategy(), "./");
         invoker.executeCommand(saveAsJson);
 
         System.out.println("Saving file as XML...");
-        SaveFileCommand saveAsXml = new SaveFileCommand(fileRepository, file, new XmlSaveStrategy(), "./");
+        Command saveAsXml = new SaveFileCommand(fileRepository, file, new XmlSaveStrategy(), "./");
         invoker.executeCommand(saveAsXml);
 
         // Опціонально: Undo останньої команди
@@ -42,4 +47,3 @@ public class Main {
         invoker.undoLastCommand();
     }
 }
-
